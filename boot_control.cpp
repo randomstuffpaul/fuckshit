@@ -52,6 +52,7 @@ extern "C" {
 #define BOOT_IMG_PTN_NAME "boot"
 #define LUN_NAME_END_LOC 14
 #define BOOT_SLOT_PROP "ro.boot.slot_suffix"
+#define BOOT_SLOT_NEXT_PROP "bootctrl.slot.next"
 
 #define SLOT_ACTIVE 1
 #define SLOT_INACTIVE 2
@@ -526,6 +527,7 @@ int set_active_boot_slot(struct boot_control_module *module, unsigned slot)
 	int is_ufs = gpt_utils_is_ufs_device();
 	map<string, vector<string>>::iterator map_iter;
 	vector<string>::iterator string_iter;
+	char slot_val[PROP_VALUE_MAX];
 
 	if (boot_control_check_slot_sanity(module, slot)) {
 		ALOGE("%s: Bad arguments", __func__);
@@ -562,6 +564,10 @@ int set_active_boot_slot(struct boot_control_module *module, unsigned slot)
 			continue;
 		boot_ctl_set_active_slot_for_partitions(map_iter->second, slot);
 	}
+
+	sprintf(slot_val, "%u", slot);
+	property_set(BOOT_SLOT_NEXT_PROP, slot_val);
+
 	if (is_ufs) {
 		if (!strncmp(slot_suffix_arr[slot], AB_SLOT_A_SUFFIX,
 					strlen(AB_SLOT_A_SUFFIX))){
