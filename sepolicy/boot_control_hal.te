@@ -1,0 +1,1 @@
+allow boot_control_hal boot_control_hal_prop:property_service set;
